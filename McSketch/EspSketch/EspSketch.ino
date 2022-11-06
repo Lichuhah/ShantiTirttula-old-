@@ -4,7 +4,6 @@
 #include <ESP8266HTTPClient.h> 
 #include <FS.h>
 #include <ArduinoJson.h>
-#include <Ticker.h> 
 #include <WiFiClientSecure.h>
 IPAddress apIP(192, 168, 4, 1);
 
@@ -24,10 +23,12 @@ String SSDP_Name = ""; // Имя SSDP
 String _serialNum="";
 String _login="";
 String jsonConfig = "{}";
-
+const char* fingerprint = "65 DD AD A7 A5 50 DB E8 38 9E 79 13 DC AF D3 60 BF BF 9F B9";
+int currentTics = 0;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  pinMode(5, INPUT);
   Serial.println("");
   //Запускаем файловую систему
   Serial.println("Start 4-FS");
@@ -46,6 +47,90 @@ void setup() {
 }
 
 void loop() {
-  HTTP.handleClient();
+  //HTTP.handleClient();
+  currentTics++;
+  if(currentTics==10000){
+    readSensors();
+  }
   delay(1);
+}
+
+void readSensors(){
+    readLight();
+    currentTics=0;
+}
+
+void readLight(){
+    while(true){
+      int signal = Serial.parseInt();
+      if(signal==1){
+        sendLight(Serial.parseInt());
+        break;
+      }
+    }
+}
+
+void sendLight(int value){
+  WiFiClientSecure client;
+  int port = 443;
+  String host = "shantitest.somee.com";
+  String url = "/mcdata/sendlight";
+  String json = "{";
+  json += "\"serial\":\"";
+  json += _serialNum;
+  json += "\",\"value\":\"";
+  json += value;
+  json += "\"}";
+
+  client.setFingerprint(fingerprint);
+  client.setTimeout(10000);
+  int r=0; //retry counter
+  while((!client.connect(host, port)) && (r < 30)){
+      delay(100);
+      Serial.print(".");
+      r++;
+  }
+
+  if(r==30) {
+    Serial.println("Connection failed");
+  }
+  else {
+    Serial.println("Connected to web");
+  }
+
+  String a = String("POST ") + url + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n" +
+               "Content-Type: application/json"+ "\r\n" +
+               "Content-Length: " + (json.length()+2) + "\r\n\r\n" +
+                json + "\r\n" +
+               "Connection: close\r\n\r\n";
+  Serial.println(a);
+  client.print(String("POST ") + url + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n" +
+               "Content-Type: application/json"+ "\r\n" +
+               "Content-Length: " + (json.length()+2) + "\r\n\r\n" +
+                json + "\r\n" +
+               "Connection: close\r\n\r\n");
+
+  Serial.println("request sent");
+                  
+  while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line == "\r") {
+      Serial.println("headers received");
+      break;
+    }
+  }
+
+  Serial.println("reply was:");
+  Serial.println("==========");
+  String line;
+  while(client.available()){        
+    line = client.readStringUntil('\n');  //Read Line by Line
+    Serial.println(line); //Print response
+  }
+  Serial.println("==========");
+  Serial.println("closing connection");
+
+
 }
