@@ -46,6 +46,25 @@
 	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhttp.send(JSON.stringify({"Login":val('login'), "Password": val('userpass')})); 
    }
+   function get_code(submit){
+    server = "https://shantitest.somee.com/mc/getcode";
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == XMLHttpRequest.DONE) {
+			alert(xhttp.responseText);
+			set_code(xhttp.responseText);
+		}
+	}
+    xhttp.open("POST", server);
+	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhttp.send(JSON.stringify({"Login":val('login'), "Password": val('userpass'), "MAC": val('macaddr')})); 
+   }
+   function set_code(codedata){
+    server = "/serial?serial="+codedata;
+	var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", server, true);
+    xhttp.send(); 
+   }
   </script>
  </head>
  <body onload="load();">
@@ -69,6 +88,11 @@
      <input class="btn btn-block btn-success" value="Ауторизация" onclick="auth(this);" type="submit">
 	 <label id="WifiIsConnect"></label>
      <hr>
+	 <h2>Регистраиция устройства</h2>
+     <input id="serial" value="{{serial}}" class="form-control" pattern="[0-9a-zA-Z.]{1,15}" placeholder="Серийный номер">
+     <input id="macaddr" value="{{macaddr}}" class="form-control" placeholder="MAC адрес">
+	 <input class="btn btn-block btn-success" value="Получить код" onclick="get_code(this);" type="submit">
+	 <hr>	
      <input class="btn btn-block btn-warning" value="Перезагрузить устройство" onclick="restart(this,'Вы действительно хотите перезагрузить устройство?');" type="submit">
      <a class="btn btn-block btn-default" href="/device.htm">Страница управления</a>
     </div>

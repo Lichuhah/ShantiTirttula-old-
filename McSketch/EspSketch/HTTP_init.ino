@@ -5,6 +5,7 @@ void HTTP_init(void) {
   HTTP.on("/checkssid", handle_check_Ssid);     // Установить имя и пароль роутера по запросу вида /ssid?ssid=home2&password=12345678
   HTTP.on("/ssid", handle_set_Ssid);     // Установить имя и пароль роутера по запросу вида /ssid?ssid=home2&password=12345678
   HTTP.on("/login", handle_SaveLogin);
+  HTTP.on("/serial",handle_SaveSerial);
   // Запускаем HTTP сервер
   HTTP.begin();
 
@@ -37,6 +38,11 @@ void handle_SaveLogin() {
   saveConfig();
 }
 
+void handle_SaveSerial() {
+  _serialNum = HTTP.arg("serial");
+  saveConfig();
+}
+
 // Перезагрузка модуля по запросу вида http://192.168.0.101/restart?device=ok
 void handle_Restart() {
   String restart = HTTP.arg("device");          // Получаем значение device из запроса
@@ -64,15 +70,21 @@ void handle_ConfigJSON() {
   // Пароль сети
   json += "\",\"newpassword\":\"";
   json += _newpass;
-  //
-  json += "\",\"login\":\"";
-  json += _login;
   // IP устройства
   json += "\",\"ip\":\"";
   json += WiFi.localIP().toString();
   // MAC устройства
   json += "\",\"macaddr\":\"";
   json += WiFi.macAddress();
+    // MAC устройства
+  json += "\",\"macaddr\":\"";
+  json += WiFi.macAddress();
+  // LOGIN юзера
+  json += "\",\"login\":\"";
+  json += _login;
+  // KEY устройства
+  json += "\",\"serial\":\"";
+  json += _serialNum;
   // Подключение к сети
   json += "\",\"iswificonnect\":\"";
   json += (WiFi.status() == WL_CONNECTED);
