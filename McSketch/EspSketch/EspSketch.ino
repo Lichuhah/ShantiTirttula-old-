@@ -28,7 +28,7 @@ int currentTics = 0;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(5, INPUT);
+  pinMode(5, OUTPUT);
   Serial.println("");
   //Запускаем файловую систему
   Serial.println("Start 4-FS");
@@ -56,7 +56,8 @@ void loop() {
 }
 
 void readSensors(){
-    readLight();
+    //readLight();
+    readCommands();
     currentTics=0;
 }
 
@@ -83,7 +84,7 @@ void sendLight(int value){
   json += "\"}";
 
   client.setFingerprint(fingerprint);
-  client.setTimeout(10000);
+  client.setTimeout(5000);
   int r=0; //retry counter
   while((!client.connect(host, port)) && (r < 30)){
       delay(100);
@@ -97,14 +98,6 @@ void sendLight(int value){
   else {
     Serial.println("Connected to web");
   }
-
-  String a = String("POST ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +
-               "Content-Type: application/json"+ "\r\n" +
-               "Content-Length: " + (json.length()+2) + "\r\n\r\n" +
-                json + "\r\n" +
-               "Connection: close\r\n\r\n";
-  Serial.println(a);
   client.print(String("POST ") + url + " HTTP/1.1\r\n" +
                "Host: " + host + "\r\n" +
                "Content-Type: application/json"+ "\r\n" +
@@ -131,6 +124,63 @@ void sendLight(int value){
   }
   Serial.println("==========");
   Serial.println("closing connection");
+}
 
+void readCommands(){
+  WiFiClientSecure client;
+  int port = 443;
+  String host = "shantitest.somee.com";
+  String url = "/mccommand/getcommand?key="+_serialNum;
 
+  client.setFingerprint(fingerprint);
+  client.setTimeout(1000);
+  int r=0; //retry counter
+  while((!client.connect(host, port)) && (r < 30)){
+      delay(100);
+      Serial.print(".");
+      r++;
+  }
+
+  if(r==30) {
+    Serial.println("Connection failed");
+  }
+  else {
+    Serial.println("Connected to web");
+  }
+
+   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n" +           
+               "Connection: close\r\n\r\n");
+
+    while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line == "\r") {
+      Serial.println("headers received");
+      break;
+    }
+  }
+
+  Serial.println("reply was:");
+  Serial.println("==========");
+  String line;
+  String jsonData;
+  if(client.available()){        
+    line = client.readStringUntil('\n');  //Read Line by Line
+    jsonData = client.readStringUntil('\n');
+    Serial.println(jsonData); //Print response
+  }
+  Serial.println("==========");
+  Serial.println("closing connection");
+
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& root = jsonBuffer.parseObject(jsonData);
+  String a = root["a"].as<String>(); 
+  bool b = root["b"].as<bool>();
+  if(a=="light"){
+    if(b){
+      digitalWrite(5,HIGH);
+    } else {
+      digitalWrite(5,LOW);
+    }
+  }
 }

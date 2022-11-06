@@ -39,6 +39,15 @@ namespace Shanti.Api.Controllers
             try
             {
                 command.ExecuteNonQuery();
+                if (Convert.ToInt32(data.value) < 30)
+                {
+                    McCommandController contr = new McCommandController();
+                    contr.OnLight(data.serial);
+                } else
+                {
+                    McCommandController contr = new McCommandController();
+                    contr.OffLight(data.serial);
+                }
                 return "true";
             }
             catch (Exception e)
