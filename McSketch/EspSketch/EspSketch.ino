@@ -14,8 +14,8 @@ ESP8266WebServer HTTP(80);
 File fsUploadFile;
 
 // Определяем переменные wifi
-String _ssid     = ""; // Для хранения SSID
-String _password = ""; // Для хранения пароля сети
+String _ssid     = "TP-LINK_F7FE"; // Для хранения SSID
+String _password = "393-63-461"; // Для хранения пароля сети
 String _newssid = "";
 String _newpass = "";
 String _ssidAP = "Shanti";   // SSID AP точки доступа

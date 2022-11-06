@@ -4,6 +4,7 @@ void HTTP_init(void) {
   // API для устройства
   HTTP.on("/checkssid", handle_check_Ssid);     // Установить имя и пароль роутера по запросу вида /ssid?ssid=home2&password=12345678
   HTTP.on("/ssid", handle_set_Ssid);     // Установить имя и пароль роутера по запросу вида /ssid?ssid=home2&password=12345678
+  HTTP.on("/login", handle_SaveLogin);
   // Запускаем HTTP сервер
   HTTP.begin();
 
@@ -29,6 +30,11 @@ void handle_set_Ssid() {
     saveConfig();
     ESP.restart(); 
   }
+}
+
+void handle_SaveLogin() {
+  _login = HTTP.arg("login");
+  saveConfig();
 }
 
 // Перезагрузка модуля по запросу вида http://192.168.0.101/restart?device=ok
@@ -58,6 +64,9 @@ void handle_ConfigJSON() {
   // Пароль сети
   json += "\",\"newpassword\":\"";
   json += _newpass;
+  //
+  json += "\",\"login\":\"";
+  json += _login;
   // IP устройства
   json += "\",\"ip\":\"";
   json += WiFi.localIP().toString();

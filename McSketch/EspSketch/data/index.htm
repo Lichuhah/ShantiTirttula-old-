@@ -32,6 +32,20 @@
      return false;
     }
    }
+   function auth(submit){
+    server = "https://shantitest.somee.com/login/login";
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == XMLHttpRequest.DONE) {
+			if(xhttp.responseText=="1"){
+				set_login(val('login'));
+			}
+		}
+	}
+    xhttp.open("POST", server);
+	xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhttp.send(JSON.stringify({"Login":val('login'), "Password": val('userpass')})); 
+   }
   </script>
  </head>
  <body onload="load();">
@@ -47,6 +61,12 @@
      <input id="password" value="{{password}}" pattern=".{8,15}" onfocus="this.type='text'" type="password" class="form-control" placeholder="Пароль сети">
      <input class="btn btn-block btn-success" value="Проверить подключение" onclick="check_ssid(this);" type="submit">
 	 <input class="btn btn-block btn-success" value="Сохранить изменения" onclick="set_ssid(this);" type="submit">
+	 <label id="WifiIsConnect"></label>
+     <hr>
+	 <h2>Ауторизация</h2>
+     <input id="login" value="{{login}}" class="form-control" pattern="[0-9a-zA-Z.]{1,15}" placeholder="Логин">
+     <input id="userpass" value="{{userpass}}" class="form-control" placeholder="Пароль">
+     <input class="btn btn-block btn-success" value="Ауторизация" onclick="auth(this);" type="submit">
 	 <label id="WifiIsConnect"></label>
      <hr>
      <input class="btn btn-block btn-warning" value="Перезагрузить устройство" onclick="restart(this,'Вы действительно хотите перезагрузить устройство?');" type="submit">
