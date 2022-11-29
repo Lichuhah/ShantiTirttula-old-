@@ -1,10 +1,12 @@
 ﻿using ApiTest.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 
 namespace Shanti.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class LoginController : ControllerBase
     {
@@ -16,6 +18,7 @@ namespace Shanti.Api.Controllers
             return "success";
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public bool Login([FromBody] LoginData data)
         {
@@ -43,5 +46,6 @@ namespace Shanti.Api.Controllers
                 return true;
             }
         }
+
     }
 }
