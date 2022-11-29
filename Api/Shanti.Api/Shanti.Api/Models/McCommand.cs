@@ -3,6 +3,8 @@
     public class McCommand
     {
         public int Pin { get; set; }
-        public float Value { get; set; }
+        public int Value { get; set; }
+
+        public bool isPwm { get; set; }
     }
 }

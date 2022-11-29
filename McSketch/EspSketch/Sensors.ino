@@ -1,16 +1,18 @@
 void readSensors(){
-  while(true){
+  if(apiIsConnected){
+    while(true){
       int signal = Serial.parseInt();
       if(signal==-1){
         sendLight(Serial.parseFloat());
-        delay(1);
+        delay(10);
         sendTemp(Serial.parseFloat());
-        delay(1);
+        delay(10);
         sendWet(Serial.parseFloat());
-        delay(1);
+        delay(10);
         break;
       }
     }
+  }
 }
 
 void sendLight(float val){

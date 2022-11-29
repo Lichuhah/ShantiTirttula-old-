@@ -1,3 +1,4 @@
+
 void SSDP_init(void) {
   // SSDP дескриптор
   HTTP.on("/description.xml", HTTP_GET, []() {

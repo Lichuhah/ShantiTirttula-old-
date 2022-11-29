@@ -44,7 +44,7 @@ void lightSensor(){
 double tempSensor(){
   float value = analogRead(A0);
   int range = 125;
-  double Tf = value * (range/(1024/5.0*3.3));
+  double Tf = value * (range/(1024/5.0*5.0));
   temp_value = (Tf-32)*5/9;
 }
 

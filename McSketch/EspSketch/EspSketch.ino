@@ -12,18 +12,18 @@ ESP8266WebServer HTTP(80);
 // Для файловой системы
 File fsUploadFile;
 
-// Определяем переменные wifi
 String _ssid     = "TP-LINK_F7FE"; // Для хранения SSID
 String _password = "393-63-461"; // Для хранения пароля сети
 String _newssid = "";
 String _newpass = "";
-String _ssidAP = "Shanti";   // SSID AP точки доступа
 String _passwordAP = ""; // пароль точки доступа
+String _ssidAP = "Shanti";   // SSID AP точки доступа
 String SSDP_Name = ""; // Имя SSDP
 String _serialNum="";
 String _login="";
 String jsonConfig = "{}";
 int currentTics = 0;
+bool apiIsConnected = false;
 
 void setup() {
   Serial.begin(9600);
@@ -56,71 +56,8 @@ void loop() {
   if(currentTics==10000){
     APIinit();
     readSensors();
+    runCommands();
     currentTics=0;
   }
-  //culerWork(0.60);
   delay(1);
-}
-
-
-void readCommands(){
-  WiFiClientSecure client;
-  int port = 443;
-  String host = "shantitest.somee.com";
-  String url = "/mccommand/getcommand?key="+_serialNum;
-
-  //client.setFingerprint(fingerprint);
-  client.setTimeout(1000);
-  int r=0; //retry counter
-  while((!client.connect(host, port)) && (r < 30)){
-      delay(100);
-      Serial.print(".");
-      r++;
-  }
-
-  if(r==30) {
-    Serial.println("Connection failed");
-  }
-  else {
-    Serial.println("Connected to web");
-  }
-
-   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +           
-               "Connection: close\r\n\r\n");
-
-    while (client.connected()) {
-    String line = client.readStringUntil('\n');
-    if (line == "\r") {
-      Serial.println("headers received");
-      break;
-    }
-  }
-
-  Serial.println("reply was:");
-  Serial.println("==========");
-  String line;
-  String jsonData;
-  if(client.available()){        
-    line = client.readStringUntil('\n');  //Read Line by Line
-    jsonData = client.readStringUntil('\n');
-    Serial.println(jsonData); //Print response
-  }
-  Serial.println("==========");
-  Serial.println("closing connection");
-
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& root = jsonBuffer.parseObject(jsonData);
-  String a = root["a"].as<String>(); 
-  bool b = root["b"].as<bool>();
-  if(a=="light"){
-   if(b){ digitalWrite(16,HIGH); } else { digitalWrite(16,LOW); }
-  }
-  if(a=="water"){
-   if(b){ digitalWrite(5,HIGH); } else { digitalWrite(5,LOW); }
-  }
-  if(a=="cooler"){
-   if(b){ digitalWrite(4,HIGH); } else { digitalWrite(4,LOW); }
-  }
-  
 }

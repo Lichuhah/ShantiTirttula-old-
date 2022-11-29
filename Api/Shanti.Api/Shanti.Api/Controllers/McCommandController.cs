@@ -13,29 +13,31 @@ namespace Shanti.Api.Controllers
     {
         string con = "Data Source=TestApiDB.mssql.somee.com;Initial Catalog=TestApiDB;User ID=DeadHatred_SQLLogin_2;Password=u5y75krtih";
 
-        //[HttpGet("getcommand")]
-        //public string GetLastCommand(string key)
-        //{
-        //    SqlConnection connection = new SqlConnection(con);
-        //    SqlCommand command = new SqlCommand(
-        //        "SELECT * FROM [MC_COMMAND] WHERE MC_KEY = @key;"
-        //        , connection);
-        //    command.Parameters.AddWithValue("@key", key);
-        //    connection.Open();
-        //    SqlDataReader reader = command.ExecuteReader();
-        //    string result = string.Empty;
-        //    McCommand mccommand = new McCommand();
-        //    try
-        //    {
-        //        while (reader.Read())
-        //        {
-        //            mccommand.a = reader["A"].ToString();
-        //            mccommand.b = reader["B"].ToString();
-        //        }
-        //        reader.Close();
-        //        return JsonConvert.SerializeObject(mccommand);
-        //    } catch (Exception e) { throw new Exception(e.Message); }
-        //}
+        [HttpGet("getcommand")]
+        public string GetLastCommand(string key)
+        {
+            SqlConnection connection = new SqlConnection(con);
+            SqlCommand command = new SqlCommand(
+                "SELECT * FROM [MC_COMMAND] WHERE MC_KEY = @key;"
+                , connection);
+            command.Parameters.AddWithValue("@key", key);
+            connection.Open();
+            SqlDataReader reader = command.ExecuteReader();
+            string result = string.Empty;
+            McCommand mccommand = new McCommand();
+            try
+            {
+                while (reader.Read())
+                {
+                    mccommand.Pin = (int)reader["PIN"];
+                    mccommand.Value = (int)reader["VALUE"];
+                    mccommand.isPwm = false;
+                }
+                reader.Close();
+                return JsonConvert.SerializeObject(mccommand);
+            }
+            catch (Exception e) { throw new Exception(e.Message); }
+        }
 
         [HttpPost("addcommand")]
         public string AddNewCommand(string key, [FromBody] McCommand com)

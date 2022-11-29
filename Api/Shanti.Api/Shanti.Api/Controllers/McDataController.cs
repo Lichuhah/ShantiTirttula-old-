@@ -40,7 +40,7 @@ namespace Shanti.Api.Controllers
             connection.Open();
             try
             {
-                command.ExecuteNonQuery();
+                //command.ExecuteNonQuery();
                 //if (Convert.ToInt32(data.value) < 30)
                 //{
                 //    McCommandController contr = new McCommandController();
