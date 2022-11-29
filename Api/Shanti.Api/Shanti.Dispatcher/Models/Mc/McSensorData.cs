@@ -1,6 +1,6 @@
 ﻿namespace Shanti.Dispatcher.Models.Mc
 {
-    public class McSensorData : McData
+    public class McSensorData
     {
         public int SensorId { get; set; }
         public float Value { get; set; }

@@ -1,3 +1,5 @@
+using Shanti.Dispatcher.Models.Hash;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,7 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
-
+builder.Services.AddSingleton<SessionList>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
