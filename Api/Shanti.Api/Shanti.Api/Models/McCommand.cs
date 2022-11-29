@@ -2,7 +2,7 @@
 {
     public class McCommand
     {
-        public string a { get; set; }
-        public string b { get; set; }
+        public int Pin { get; set; }
+        public float Value { get; set; }
     }
 }

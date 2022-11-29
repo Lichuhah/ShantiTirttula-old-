@@ -1,5 +1,6 @@
 ﻿using ApiTest.Models;
 using Microsoft.AspNetCore.Mvc;
+using Shanti.Api.Models;
 using System.Data.SqlClient;
 
 namespace Shanti.Api.Controllers
@@ -24,30 +25,31 @@ namespace Shanti.Api.Controllers
         //    return Convert.ToInt32(reader["ID"]);
         //}
 
-        [HttpPost("sendLight")]
-        public string SendLight([FromBody] LightData data)
+        [HttpPost("sendSensor")]
+        public string SendLight([FromBody] SensorData data)
         {
             //int controllerId = GetIdBySerial(data.serial);
             SqlConnection connection = new SqlConnection(con);
             SqlCommand command = new SqlCommand(
-                "INSERT INTO [MC_LIGHT_DATA] (MC_KEY, VALUE, DATETIME) VALUES (@key, @val, @data);"
+                "INSERT INTO [MC_SENSOR_DATA] (MC_KEY, VALUE, DATETIME, DEVICE) VALUES (@key, @val, @data, @dev);"
                 , connection);
             command.Parameters.AddWithValue("@key", data.serial);
             command.Parameters.AddWithValue("@val", data.value);
             command.Parameters.AddWithValue("@data", DateTime.UtcNow);
+            command.Parameters.AddWithValue("@dev", data.device);
             connection.Open();
             try
             {
                 command.ExecuteNonQuery();
-                if (Convert.ToInt32(data.value) < 30)
-                {
-                    McCommandController contr = new McCommandController();
-                    contr.OnLight(data.serial);
-                } else
-                {
-                    McCommandController contr = new McCommandController();
-                    contr.OffLight(data.serial);
-                }
+                //if (Convert.ToInt32(data.value) < 30)
+                //{
+                //    McCommandController contr = new McCommandController();
+                //    contr.OnLight(data.serial);
+                //} else
+                //{
+                //    McCommandController contr = new McCommandController();
+                //    contr.OffLight(data.serial);
+                //}
                 return "true";
             }
             catch (Exception e)

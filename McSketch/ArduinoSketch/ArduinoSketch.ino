@@ -27,12 +27,11 @@ void loop() {
   wetSensor();
   waterSensor();
  //digitalWrite(4, light_value);
-  Serial.println(1);
+  Serial.println(-1);
   Serial.println(light_value);
   Serial.println(temp_value);
   Serial.println(wet_value);
-  Serial.println(water_value);
-  Serial.println(-1);
+  Serial.println(-2);
   delay(5000);
 }
 
