@@ -18,20 +18,21 @@ namespace Shanti.Api.Controllers
             SqlConnection connection = new SqlConnection(con);
             DispatcherTrigger trigger = new DispatcherTrigger();
             trigger.DeviceId = newtrigger.DeviceId;
-            trigger.ControllerId = newtrigger.ControllerId;
             trigger.CommandValue = newtrigger.CommandValue;
             trigger.TriggerValue = newtrigger.TriggerValue;
+            trigger.SensorId = newtrigger.SensorId;
 
             int typeId = 0;
             SqlCommand command = new SqlCommand(
-                "SELECT TYPE_ID FROM CONTROLLER WHERE ID = @id;"
+                "SELECT * FROM CONTROLLER WHERE ID = @id;"
                 , connection);
-            command.Parameters.AddWithValue("@id", trigger.ControllerId);
+            command.Parameters.AddWithValue("@id", newtrigger.ControllerId);
             connection.Open();
             SqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
                 typeId = (int)reader["TYPE_ID"];
+                trigger.Serial = reader["SERIAL"].ToString();
             }
             reader.Close();
 

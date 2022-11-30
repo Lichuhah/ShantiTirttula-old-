@@ -9,11 +9,15 @@ namespace Shanti.Dispatcher.Models.Hash
         public McData Mc { get; set; }
         public string Token { get; set; }
         public List<List<McSensorData>> SensorsData { get; set;}
+        public List<DispatcherTrigger> Triggers { get; set; }
+        public List<McCommand> Commands { get; set; }
         public DateTime LastSendTime { get; set; }
         public DateTime CreateTime { get; set; }
         public Session()
         {
             SensorsData = new List<List<McSensorData>>();
+            Triggers = new List<DispatcherTrigger>();
+            Commands = new List<McCommand>();
         }
         public void AddSensordData(List<McSensorData> data)
         {
@@ -39,8 +43,6 @@ namespace Shanti.Dispatcher.Models.Hash
                 data.Add(new McSensorData { SensorId = id, Value = value/SensorsData.Count });
             }
             SendAverageDataToServer(data);
-            LastSendTime = DateTime.UtcNow;
-            SensorsData.Clear();
         }
 
         private bool SendAverageDataToServer(List<McSensorData> data)
@@ -49,6 +51,8 @@ namespace Shanti.Dispatcher.Models.Hash
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7184/SensorData/send");
             request.Headers.Add("Authorization", "Bearer " + this.Token);
             request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            this.LastSendTime = DateTime.UtcNow;
+            this.SensorsData.Clear();
             try
             {
                 HttpResponseMessage response = client.Send(request);
@@ -60,11 +64,6 @@ namespace Shanti.Dispatcher.Models.Hash
             {
                 Console.WriteLine(ex.Message);
                 return false;
-            }
-            finally
-            {
-                this.LastSendTime = DateTime.UtcNow;
-                this.SensorsData.Clear();
             }
         }
     }

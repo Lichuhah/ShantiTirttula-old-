@@ -30,7 +30,7 @@ app.MapControllers();
 
 app.UseSession();
 
-TcpApiClient tcpClient = TcpApiClient.getInstance();
+TcpApiClient tcpClient = TcpApiClient.getInstance(app);
 tcpClient.StartAsync("127.0.0.1", 8888);
 
 app.Run();
