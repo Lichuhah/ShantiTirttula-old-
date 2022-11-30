@@ -28,7 +28,7 @@ namespace Shanti.Api.Controllers
             HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             SqlConnection connection = new SqlConnection(con);
             SqlCommand command = new SqlCommand(
-                "SELECT * FROM [CONTROLLER] WHERE MAC = @mac AND U_KEY = @key;"
+                "SELECT * FROM [CONTROLLER] WHERE MAC = @mac AND SERIAL = @key;"
                 , connection);
             command.Parameters.AddWithValue("@mac", data.MAC);
             command.Parameters.AddWithValue("@key", data.Serial);
@@ -42,6 +42,7 @@ namespace Shanti.Api.Controllers
                     result += reader["ID"];
                 }
                 reader.Close();
+                connection.Close();
                 if (String.IsNullOrEmpty(result))
                 {
                     return "false data";
@@ -52,6 +53,8 @@ namespace Shanti.Api.Controllers
             }
             catch (Exception e)
             {
+                reader.Close();
+                connection.Close();
                 return e.Message;
             }
         }

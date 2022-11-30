@@ -17,7 +17,7 @@ namespace Shanti.Dispatcher.Models.Hash
             Session session = Sessions.FirstOrDefault(x => x.Mc.MAC == data.MAC && x.Mc.Serial == data.Serial);
             if (session != null)
             {
-                if(DateTime.UtcNow-session.CreateTime < TimeSpan.FromMinutes(15))
+                if(DateTime.UtcNow-session.CreateTime > TimeSpan.FromMinutes(15))
                 {
                     return session;
                 } else return RefreshSession(session);
@@ -35,6 +35,7 @@ namespace Shanti.Dispatcher.Models.Hash
 
             Session session = new Session()
             {
+                CreateTime = DateTime.UtcNow,
                 LastSendTime = DateTime.UtcNow,
                 Token = token,
                 Mc = data
@@ -55,7 +56,8 @@ namespace Shanti.Dispatcher.Models.Hash
             Sessions.Remove(oldsession);
             Session session = new Session()
             {
-                LastSendTime = DateTime.UtcNow,
+                CreateTime = DateTime.UtcNow,
+                LastSendTime = oldsession.LastSendTime,
                 Token = token,
                 Mc = oldsession.Mc,
                 SensorsData = oldsession.SensorsData

@@ -9,7 +9,6 @@ namespace Shanti.Dispatcher
     public class SensorSendData
     {
         public float Value { get; set; }
-        public int Device { get; set; }
-        public string Serial { get; set; }
+        public int SensorId { get; set; }
     }
 }

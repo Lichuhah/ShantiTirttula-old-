@@ -15,13 +15,13 @@ namespace Shanti.Api.Controllers
             List<string> codes = new List<string>();
             SqlConnection connection = new SqlConnection(con);
             SqlCommand command = new SqlCommand(
-                "SELECT U_KEY FROM [CONTROLLER]"
+                "SELECT SERIAL FROM [CONTROLLER]"
                 , connection);
             connection.Open();
             SqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                codes.Add(reader["U_KEY"].ToString());
+                codes.Add(reader["SERIAL"].ToString());
             }
             reader.Close();
             Random random = new Random(DateTime.UtcNow.Millisecond);
@@ -48,10 +48,12 @@ namespace Shanti.Api.Controllers
             try
             {
                 command.ExecuteNonQuery();
+                connection.Close();
                 return true;
             }
             catch (Exception e)
             {
+                connection.Close();
                 return false;
             }
         }
@@ -75,6 +77,7 @@ namespace Shanti.Api.Controllers
                     result += reader["ID"].ToString();
                 }
                 reader.Close();
+                connection.Close();
                 if (result != string.Empty)
                 {
                     string code = generateNewCode();
@@ -88,6 +91,7 @@ namespace Shanti.Api.Controllers
             }
             catch (Exception e)
             {
+                connection.Close();
                 return e.Message;
             }
         }

@@ -39,10 +39,12 @@ namespace Shanti.Api.Controllers
                     result += reader["Login"];
                 }
                 reader.Close();
+                connection.Close();
                 return result != string.Empty ? true : false;
             }
             catch (Exception e)
             {
+                connection.Close();
                 return true;
             }
         }

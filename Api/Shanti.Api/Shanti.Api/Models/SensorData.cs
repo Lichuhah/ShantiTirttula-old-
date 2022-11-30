@@ -2,8 +2,7 @@
 {
     public class SensorData
     {
-        public string serial { get; set; }
-        public float value { get; set; }
-        public int device { get; set; }
+        public float Value { get; set; }
+        public int SensorId { get; set; }
     }
 }

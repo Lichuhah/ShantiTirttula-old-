@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 
 Random rnd = new Random(DateTime.UtcNow.Millisecond);
-
+DateTime StartTime = DateTime.UtcNow;
 ESP esp1 = new ESP { Key = "AAAAAAAAAAAAAAAA", MAC = "AA:AA:AA:AA:AA:AA" };
 ESP esp2 = new ESP { Key = "BBBBBBBBBBBBBBBB", MAC = "BB:BB:BB:BB:BB:BB" };
 ESP esp3 = new ESP { Key = "CCCCCCCCCCCCCCCC", MAC = "CC:CC:CC:CC:CC:CC" };
@@ -13,8 +13,9 @@ List<ESP> espList = new List<ESP>() { esp1, esp2, esp3 };
 
 while (true)
 {
-    sendSensorData();
-    Thread.Sleep(500);
+    SensorData sensor = new SensorData { SensorId = 1, Value = (float)rnd.NextDouble() };
+    httpPost(esp1, sensor);
+    Thread.Sleep(1000);
 }
 
 void sendSensorData()
@@ -36,13 +37,13 @@ void httpPost(ESP esp, SensorData data)
 {
     HttpClient client = new HttpClient();
     var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7160/Sensor/send");
-    request.Content = new StringContent(new Newtonsoft.Json., Encoding.UTF8, "application/json");
-
+    request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+    request.Headers.Add("Serial", esp.Key);
+    request.Headers.Add("Mac", esp.MAC);
     try
     {
-        HttpResponseMessage response = client.Send(request);
-        string answer = response.Content.ReadAsStringAsync().Result;
-        Console.WriteLine(answer);
+        client.SendAsync(request);
+        Console.WriteLine((DateTime.UtcNow - StartTime).TotalSeconds);
     } catch (Exception ex)
     {
         Console.WriteLine(ex.Message);
