@@ -1,6 +1,7 @@
 WiFiClientSecure client;
 int shantiPort = 443;
 String shantiHost = "shantitest.somee.com";
+String shantiDispHost = "shantidisp.somee.com";
 
 void APIinit(){
   int r = 0;
@@ -19,11 +20,13 @@ void APIinit(){
   }
 }
 
-void sendSensorValue(String url, int sensor, float value){
-  String json = getSensorJson(sensor, value);
+void sendSensorValue(String url, int sensors[], float values[]){
+  String json = getSensorJson(sensors, values);
   Serial.println(json);
   client.print(String("POST ") + url + " HTTP/1.1\r\n" +
-               "Host: " + shantiHost + "\r\n" +
+               "Host: " + shantiDispHost + "\r\n" +
+               "Serial: " + _serial + "\r\n" +  
+               "Mac: " + WiFi.macAddress() + "\r\n" +   
                "Content-Type: application/json"+ "\r\n" +
                "Content-Length: " + (json.length()+2) + "\r\n\r\n" +
                 json + "\r\n");
@@ -48,9 +51,11 @@ void sendSensorValue(String url, int sensor, float value){
 }
 
 JsonObject& readCommand(){
-    String url = "/mccommand/getcommand?key="+_serialNum;
+    String url = "/command/get";
     client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-          "Host: " + shantiHost + "\r\n" +           
+          "Host: " + shantiDispHost + "\r\n" + 
+          "Serial: " + _serial + "\r\n" +  
+          "Mac: " + WiFi.macAddress() + "\r\n" +        
           "Connection: close\r\n\r\n");
 
     while (client.connected()) {
@@ -78,14 +83,16 @@ JsonObject& readCommand(){
     return root;
 }
 
-String getSensorJson(int sensor, float value){
-  String json = "{";
-  json += "\"serial\":\"";
-  json += _serialNum;
-  json += "\",\"value\":\"";
-  json += value;
-   json += "\",\"device\":\"";
-  json += sensor;
-  json += "\"}";
+String getSensorJson(int sensors[], float values[]){
+  String json = "[";
+  for(int i=0; i<sizeof(sensors)/sizeof(sensors[0]); i++){
+    json += "{";
+    json += "\"\"value\":\"";
+    json += value;
+    json += "\",\"device\":\"";
+    json += sensor;
+    json += "\"}";
+  }
+  json += "]";
   return json;
 }

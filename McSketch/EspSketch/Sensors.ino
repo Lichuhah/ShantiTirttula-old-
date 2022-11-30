@@ -3,26 +3,14 @@ void readSensors(){
     while(true){
       int signal = Serial.parseInt();
       if(signal==-1){
-        sendLight(Serial.parseFloat());
-        delay(10);
-        sendTemp(Serial.parseFloat());
-        delay(10);
-        sendWet(Serial.parseFloat());
-        delay(10);
+        float light = Serial.parseFloat();
+        float temp = Serial.parseFloat();
+        float wet = Serial.parseFloat();
+        int sensors[3] = {1,2,3};
+        float datas[3] = {light, temp, wet};
+        sendSensorValue("/sensor/send",sensors,datas);
         break;
       }
     }
   }
-}
-
-void sendLight(float val){
-  sendSensorValue("/mcdata/sendsensor",1,val);
-}
-
-void sendTemp(float val){
-  sendSensorValue("/mcdata/sendsensor",2,val);
-}
-
-void sendWet(float val){
-  sendSensorValue("/mcdata/sendsensor",3,val);
 }

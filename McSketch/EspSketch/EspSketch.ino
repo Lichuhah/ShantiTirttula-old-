@@ -56,7 +56,7 @@ void loop() {
   if(currentTics==10000){
     APIinit();
     readSensors();
-    runCommands();
+    //runCommands();
     currentTics=0;
   }
   delay(1);
