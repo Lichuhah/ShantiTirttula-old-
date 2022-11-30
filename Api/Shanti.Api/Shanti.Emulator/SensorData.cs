@@ -3,6 +3,6 @@
     public class SensorData
     {
         public float Value { get; set; }
-        public int DeviceId { get; set; }
+        public int SensorId { get; set; }
     }
 }

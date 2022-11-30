@@ -16,7 +16,12 @@ namespace Shanti.Dispatcher.Models.Hash
         {
             Session session = Sessions.FirstOrDefault(x => x.Mc.MAC == data.MAC && x.Mc.Serial == data.Serial);
             if (session != null)
-                return session;
+            {
+                if(DateTime.UtcNow-session.CreateTime < TimeSpan.FromMinutes(15))
+                {
+                    return session;
+                } else return RefreshSession(session);
+            }
             else return CreateSession(data);
         }
 
@@ -30,9 +35,30 @@ namespace Shanti.Dispatcher.Models.Hash
 
             Session session = new Session()
             {
-                LastSend = DateTime.UtcNow,
+                LastSendTime = DateTime.UtcNow,
                 Token = token,
                 Mc = data
+            };
+
+            Sessions.Add(session);
+            return session;
+        }
+
+        public Session RefreshSession(Session oldsession)
+        {
+            HttpClient client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7184/Dispatcher/token");
+            request.Content = new StringContent(JsonConvert.SerializeObject(oldsession.Mc), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.SendAsync(request).Result;
+            string token = response.Content.ReadAsStringAsync().Result;
+
+            Sessions.Remove(oldsession);
+            Session session = new Session()
+            {
+                LastSendTime = DateTime.UtcNow,
+                Token = token,
+                Mc = oldsession.Mc,
+                SensorsData = oldsession.SensorsData
             };
 
             Sessions.Add(session);
