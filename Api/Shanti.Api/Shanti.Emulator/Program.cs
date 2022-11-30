@@ -13,8 +13,7 @@ List<ESP> espList = new List<ESP>() { esp1, esp2, esp3 };
 
 while (true)
 {
-    SensorData sensor = new SensorData { SensorId = 1, Value = (float)rnd.NextDouble() };
-    httpPost(esp1, sensor);
+    sendSensorData();
     Thread.Sleep(1000);
 }
 
@@ -22,18 +21,14 @@ void sendSensorData()
 {
     foreach (ESP esp in espList)
     {
-        SensorData sensor = new SensorData { SensorId = 1, Value = (float)rnd.NextDouble() };
-        httpPost(esp1, sensor);
-        //sensor = new SensorData { SensorId = 2, Value = (float)rnd.NextDouble() };
-        //httpPost(esp, sensor);
-        //sensor = new SensorData { SensorId = 3, Value = (float)rnd.NextDouble() };
-        //httpPost(esp, sensor);
-        //sensor = new SensorData { SensorId = 4, Value = (float)rnd.NextDouble() };
-        //httpPost(esp,sensor);
+        SensorData sensor1 = new SensorData { SensorId = 1, Value = (float)rnd.NextDouble() };
+        SensorData sensor2 = new SensorData { SensorId = 2, Value = (float)rnd.NextDouble() };
+        httpPost(esp, new List<SensorData> { sensor1, sensor2 });
+        Thread.Sleep(5);
     }
 }
 
-void httpPost(ESP esp, SensorData data)
+void httpPost(ESP esp, List<SensorData> data)
 {
     HttpClient client = new HttpClient();
     var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7160/Sensor/send");

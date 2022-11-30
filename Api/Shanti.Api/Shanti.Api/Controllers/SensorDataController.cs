@@ -14,21 +14,24 @@ namespace Shanti.Api.Controllers
         string con = "Data Source=TestApiDB.mssql.somee.com;Initial Catalog=TestApiDB;User ID=DeadHatred_SQLLogin_2;Password=u5y75krtih";
 
         [HttpPost("send")]
-        public string SendLight([FromBody] SensorData data)
+        public string SendLight([FromBody] List<SensorData> data)
         {
             int controllerId = GetIdBySerial();
             SqlConnection connection = new SqlConnection(con);
-            SqlCommand command = new SqlCommand(
-                "INSERT INTO [CONTROLLER_SENSOR_DATA] (CONTROLLER_ID, TYPE_SENSOR_ID, VALUE, DATE) VALUES (@cid, @tid, @val, @data);"
-                , connection);
-            command.Parameters.AddWithValue("@cid", controllerId);
-            command.Parameters.AddWithValue("@tid", data.SensorId);
-            command.Parameters.AddWithValue("@data", DateTime.UtcNow);
-            command.Parameters.AddWithValue("@val", data.Value);
-            connection.Open();
             try
             {
-                command.ExecuteNonQuery();
+                foreach (var sensorData in data)
+                {
+                    SqlCommand command = new SqlCommand(
+                    "INSERT INTO [CONTROLLER_SENSOR_DATA] (CONTROLLER_ID, TYPE_SENSOR_ID, VALUE, DATE) VALUES (@cid, @tid, @val, @data);"
+                    , connection);
+                    command.Parameters.AddWithValue("@cid", controllerId);
+                    command.Parameters.AddWithValue("@tid", sensorData.SensorId);
+                    command.Parameters.AddWithValue("@data", DateTime.UtcNow);
+                    command.Parameters.AddWithValue("@val", sensorData.Value);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
                 connection.Close();
                 return "true";
             }

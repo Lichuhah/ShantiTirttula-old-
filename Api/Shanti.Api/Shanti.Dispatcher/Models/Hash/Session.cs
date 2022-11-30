@@ -1,4 +1,6 @@
-﻿using Shanti.Dispatcher.Models.Mc;
+﻿using Newtonsoft.Json;
+using Shanti.Dispatcher.Models.Mc;
+using System.Text;
 
 namespace Shanti.Dispatcher.Models.Hash
 {
@@ -6,14 +8,14 @@ namespace Shanti.Dispatcher.Models.Hash
     {
         public McData Mc { get; set; }
         public string Token { get; set; }
-        public List<McSensorData> SensorsData { get; set;}
+        public List<List<McSensorData>> SensorsData { get; set;}
         public DateTime LastSendTime { get; set; }
         public DateTime CreateTime { get; set; }
         public Session()
         {
-            SensorsData = new List<McSensorData>();
+            SensorsData = new List<List<McSensorData>>();
         }
-        public void AddSensordData(McSensorData data)
+        public void AddSensordData(List<McSensorData> data)
         {
             this.SensorsData.Add(data);
             if(DateTime.UtcNow - LastSendTime > TimeSpan.FromSeconds(60))
@@ -24,13 +26,46 @@ namespace Shanti.Dispatcher.Models.Hash
 
         public void SendSensorData()
         {
-            IEnumerable<int> ids = SensorsData.Select(x => x.SensorId).Distinct();
-            foreach(var id in ids)
+            List<int> ids = SensorsData.First().Select(x => x.SensorId).Distinct().ToList();
+            List<McSensorData> data = new List<McSensorData>();
+
+            foreach (int id in ids)
             {
-                double value = SensorsData.Where(x => x.SensorId == id).Average(x => x.Value);
+                float value = 0;
+                foreach (List<McSensorData> package in SensorsData)
+                {
+                    value += package.Where(x => x.SensorId == id).Average(x => x.Value);
+                }
+                data.Add(new McSensorData { SensorId = id, Value = value/SensorsData.Count });
             }
+            SendAverageDataToServer(data);
             LastSendTime = DateTime.UtcNow;
             SensorsData.Clear();
+        }
+
+        private bool SendAverageDataToServer(List<McSensorData> data)
+        {
+            HttpClient client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7184/SensorData/send");
+            request.Headers.Add("Authorization", "Bearer " + this.Token);
+            request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            try
+            {
+                HttpResponseMessage response = client.Send(request);
+                string answer = response.Content.ReadAsStringAsync().Result;
+                Console.WriteLine(answer);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                this.LastSendTime = DateTime.UtcNow;
+                this.SensorsData.Clear();
+            }
         }
     }
 }
