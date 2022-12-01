@@ -39,11 +39,12 @@ namespace Shanti.Api.Controllers
         {
             SqlConnection connection = new SqlConnection(con);
             SqlCommand command = new SqlCommand(
-                "INSERT INTO [CONTROLLER] (MAC, U_KEY, USER_ID) VALUES (@mac, @code, @uid);"
+                "INSERT INTO [CONTROLLER] (MAC, SERIAL, USER_ID, TYPE_ID) VALUES (@mac, @code, @uid, @type);"
                 , connection);
             command.Parameters.AddWithValue("@uid", userId);
             command.Parameters.AddWithValue("@code", code);
             command.Parameters.AddWithValue("@mac", MAC);
+            command.Parameters.AddWithValue("@type", 1);
             connection.Open();
             try
             {

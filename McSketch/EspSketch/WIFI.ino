@@ -25,6 +25,7 @@ bool WIFIinit() {
     Serial.println("WiFi connected");
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
+    APIinit();
     return true;
   }
 }

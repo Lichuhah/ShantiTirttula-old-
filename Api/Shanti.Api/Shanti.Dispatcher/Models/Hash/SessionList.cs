@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Shanti.Dispatcher.Controllers;
 using Shanti.Dispatcher.Models.Mc;
 using System.Net.Http;
 using System.Text;
@@ -32,7 +33,7 @@ namespace Shanti.Dispatcher.Models.Hash
         public Session CreateSession(McData data)
         {
             HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7184/Dispatcher/token");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://shantitest.somee.com/Dispatcher/token");
             request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.Send(request);
             string token = response.Content.ReadAsStringAsync().Result;
@@ -42,8 +43,18 @@ namespace Shanti.Dispatcher.Models.Hash
                 CreateTime = DateTime.UtcNow,
                 LastSendTime = DateTime.UtcNow,
                 Token = token,
-                Mc = data
+                Mc = data,
             };
+
+            request = new HttpRequestMessage(HttpMethod.Post, "https://shantitest.somee.com/trigger/get?serial="+data.Serial);        
+            response = client.Send(request);
+            string trs = response.Content.ReadAsStringAsync().Result;
+            try
+            {
+                List<DispatcherTrigger> triggers = JsonConvert.DeserializeObject<List<DispatcherTrigger>>(trs);
+                session.Triggers = triggers;
+            }
+            catch (Exception ex) { }
 
             Sessions.Add(session);
             return session;
@@ -52,7 +63,7 @@ namespace Shanti.Dispatcher.Models.Hash
         public Session RefreshSession(Session oldsession)
         {
             HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7184/Dispatcher/token");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://shantitest.somee.com/Dispatcher/token");
             request.Content = new StringContent(JsonConvert.SerializeObject(oldsession.Mc), Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.Send(request);
             string token = response.Content.ReadAsStringAsync().Result;
@@ -64,7 +75,9 @@ namespace Shanti.Dispatcher.Models.Hash
                 LastSendTime = oldsession.LastSendTime,
                 Token = token,
                 Mc = oldsession.Mc,
-                SensorsData = oldsession.SensorsData
+                SensorsData = oldsession.SensorsData,
+                Triggers = oldsession.Triggers,
+                Commands = oldsession.Commands
             };
 
             Sessions.Add(session);

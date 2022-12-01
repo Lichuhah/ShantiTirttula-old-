@@ -48,7 +48,7 @@ namespace Shanti.Dispatcher.Models.Hash
         private bool SendAverageDataToServer(List<McSensorData> data)
         {
             HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7184/SensorData/send");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://shantitest.somee.com/SensorData/send");
             request.Headers.Add("Authorization", "Bearer " + this.Token);
             request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             this.LastSendTime = DateTime.UtcNow;

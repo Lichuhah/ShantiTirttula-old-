@@ -1,27 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Shanti.Dispatcher.Models.Hash;
+using Shanti.Dispatcher.Models.Mc;
 
 namespace Shanti.Dispatcher.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CommandController : BaseController
+    public class CommandController : ControllerBase
     {
-        public CommandController(IHttpContextAccessor context, SessionList sessionList) : base(context, sessionList)
+        SessionList Sesions;
+        public CommandController(SessionList sessionList)
         {
+            this.Sesions = sessionList;
         }
 
-        [HttpGet("get")]
-        public string GetCommands()
+        [HttpPost("send")]
+        public void AddCommand([FromBody] McCommand command)
         {
-            string result = "free";
-            if (Session.Commands.Any())
-            {
-                result = JsonConvert.SerializeObject(Session.Commands.First());
-                Session.Commands.Clear();
-            }
-            return result;
+            Session session = Sesions.Sessions.FirstOrDefault(x => x.Mc.Serial == command.Serial);
+            session.Commands.Add(command);
         }
     }
 }
