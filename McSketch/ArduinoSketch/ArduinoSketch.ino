@@ -24,13 +24,11 @@ void flow ()
 void loop() {
   lightSensor();
   tempSensor();
-  wetSensor();
-  waterSensor();
- //digitalWrite(4, light_value);
+  //wetSensor();
+  //waterSensor();
   Serial.println(-1);
   Serial.println(light_value);
   Serial.println(temp_value);
-  Serial.println(wet_value);
   Serial.println(-2);
   delay(5000);
 }

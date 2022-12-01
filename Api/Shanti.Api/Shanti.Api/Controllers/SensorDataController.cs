@@ -18,6 +18,7 @@ namespace Shanti.Api.Controllers
         {
             int controllerId = GetIdBySerial();
             SqlConnection connection = new SqlConnection(con);
+            connection.Open();
             try
             {
                 foreach (var sensorData in data)
@@ -29,7 +30,6 @@ namespace Shanti.Api.Controllers
                     command.Parameters.AddWithValue("@tid", sensorData.SensorId);
                     command.Parameters.AddWithValue("@data", DateTime.UtcNow);
                     command.Parameters.AddWithValue("@val", sensorData.Value);
-                    connection.Open();
                     command.ExecuteNonQuery();
                 }
                 connection.Close();

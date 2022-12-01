@@ -53,10 +53,11 @@ void setup() {
 void loop() {
   HTTP.handleClient();
   currentTics++;
-  if(currentTics==10000){
+  if(currentTics==5000){
+    Serial.println("api init");
     APIinit();
     readSensors();
-    //runCommands();
+    runCommands();
     currentTics=0;
   }
   delay(1);
