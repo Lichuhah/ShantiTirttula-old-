@@ -98,13 +98,14 @@ namespace Shanti.Api.Controllers
         }
 
         [HttpGet("get")]
-        public static List<DispatcherTrigger> GetTriggers(string serial)
+        public List<DispatcherTrigger> GetTriggers(string serial)
         {
             SqlConnection connection = new SqlConnection(con);
             SqlCommand command = new SqlCommand(
-                "SELECT * FROM [TRIGGER] JOIN [TYPE_CONTROLLER_DEVICE] TCD on [TRIGGER].TYPE_CONTROLLER_DEVICE_ID = TCD.ID  JOIN CONTROLLER C on C.ID = [TRIGGER].CONTROLLER_ID  JOIN TYPE_CONTROLLER_SENSOR TCS on TCS.ID = [TRIGGER].TYPE_CONTROLLER_SENSOR_ID  WHERE SERIAL = @ser"
+                "SELECT * FROM [TRIGGER] JOIN [TYPE_CONTROLLER_DEVICE] TCD on [TRIGGER].TYPE_CONTROLLER_DEVICE_ID = TCD.ID\r\n    " +
+                "JOIN CONTROLLER C on C.ID = [TRIGGER].CONTROLLER_ID\r\n    JOIN TYPE_CONTROLLER_SENSOR TCS on TCS.ID = [TRIGGER].TYPE_CONTROLLER_SENSOR_ID\r\n" +
+                "WHERE SERIAL = '"+serial+"'"
                 , connection);
-            command.Parameters.AddWithValue("@ser", serial);
             connection.Open();
             SqlDataReader reader = command.ExecuteReader();
             List<DispatcherTrigger> triggers = new List<DispatcherTrigger>();
@@ -112,9 +113,9 @@ namespace Shanti.Api.Controllers
             {
                 DispatcherTrigger trigger = new DispatcherTrigger();
                 trigger.DeviceId = (int)reader["TYPE_DEVICE_ID"];
-                trigger.RightCommandValue = (float)reader["TRIGGER_VALUE"];
-                trigger.LeftCommandValue = (float)reader["TRIGGER_VALUE"];
-                trigger.TriggerValue = (float)reader["TRIGGER_VALUE"];
+                trigger.RightCommandValue =Convert.ToSingle(reader["RIGHT_COMMAND_VALUE"]);
+                trigger.LeftCommandValue = Convert.ToSingle(reader["LEFT_COMMAND_VALUE"]);
+                trigger.TriggerValue = Convert.ToSingle(reader["TRIGGER_VALUE"]);
                 trigger.SensorId = (int)reader["TYPE_SENSOR_ID"];
                 trigger.IsPwm = (bool)reader["PWM"];
                 trigger.Pin = (int)reader["PIN"];
