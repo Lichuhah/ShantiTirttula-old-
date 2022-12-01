@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Shanti.Api.DispatcherService;
 using Shanti.Api.Models;
 using System.Data.SqlClient;
+using System.Text;
 using System.Windows.Input;
 
 namespace Shanti.Api.Controllers
@@ -51,9 +51,25 @@ namespace Shanti.Api.Controllers
             reader.Close();
             connection.Close();
 
-            TcpServer tcp = TcpServer.getInstance();
-            tcp.SendTrigger(trigger);
+            SendTrigger(trigger);
             return JsonConvert.SerializeObject(trigger);
+        }
+
+        public static bool SendTrigger(DispatcherTrigger trigger)
+        {
+            HttpClient client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7160/trigger/send");
+            request.Content = new StringContent(JsonConvert.SerializeObject(trigger), Encoding.UTF8, "application/json");
+            try
+            {
+                HttpResponseMessage response = client.Send(request);
+                string answer = response.Content.ReadAsStringAsync().Result;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

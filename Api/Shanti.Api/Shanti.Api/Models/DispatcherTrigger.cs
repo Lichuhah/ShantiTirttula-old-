@@ -1,4 +1,4 @@
-﻿namespace Shanti.Api.DispatcherService
+﻿namespace Shanti.Api.Models
 {
     public class DispatcherTrigger
     {

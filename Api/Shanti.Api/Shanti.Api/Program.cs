@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using Shanti.Api.DispatcherService;
+using Shanti.Api.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,6 +68,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-TcpServer tcpServer = TcpServer.getInstance();
-tcpServer.StartAsync("127.0.0.1", 8888);
 app.Run();

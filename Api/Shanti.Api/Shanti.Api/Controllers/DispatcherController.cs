@@ -77,5 +77,6 @@ namespace Shanti.Api.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
 
         }
+     
     }
 }
