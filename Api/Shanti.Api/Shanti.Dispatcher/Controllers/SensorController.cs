@@ -17,9 +17,21 @@ namespace Shanti.Dispatcher.Controllers
         [HttpPost("send")]
         public string SendData([FromBody] List<McSensorData> data)
         {
-            CheckTriggers(data);
-            Session.AddSensordData(data);
-            return "test";
+            string result = "";
+            try
+            {
+                CheckTriggers(data);
+                if (Session.Commands.Any())
+                {
+                    result = JsonConvert.SerializeObject(Session.Commands);
+                    Session.Commands.Clear();
+                }
+                Session.AddSensordData(data);
+            } catch (Exception ex)
+            {
+                result += "";
+            }
+            return result;
         }
 
         private void CheckTriggers(List<McSensorData> data)
@@ -27,28 +39,38 @@ namespace Shanti.Dispatcher.Controllers
             foreach(McSensorData sensor in data)
             {
                 List<DispatcherTrigger> triggers = Session.Triggers.Where(x => x.SensorId == sensor.SensorId).ToList();
-                if (triggers.Any())
+                foreach(DispatcherTrigger trigger in triggers)
                 {
-                    if (sensor.Value > triggers.First().TriggerValue && !triggers.First().IsCheck)
+                    CreateCommand(sensor, trigger);
+                }
+            }
+        }
+
+        private void CreateCommand(McSensorData sensor, DispatcherTrigger trigger)
+        {
+            if (sensor.Value > trigger.TriggerValue)
+            {
+                if (!trigger.IsCheck)
+                {
+                    Session.Commands.Add(new McCommand
                     {
-                        triggers.First().IsCheck = true;
-                        Session.Commands.Add(new McCommand
-                        {
-                            Pin = triggers.First().Pin,
-                            IsPwn = triggers.First().IsPwm,
-                            Value = 1
-                        });                        
-                    }
-                    else if(triggers.First().IsCheck)
+                        Pin = trigger.Pin,
+                        IsPwm = trigger.IsPwm,
+                        Value = trigger.CommandValue
+                    });
+                    trigger.IsCheck = !trigger.IsCheck;
+                }
+            } else
+            {
+                if (trigger.IsCheck)
+                {
+                    Session.Commands.Add(new McCommand
                     {
-                        triggers.First().IsCheck = false;
-                        Session.Commands.Add(new McCommand
-                        {
-                            Pin = triggers.First().Pin,
-                            IsPwn = triggers.First().IsPwm,
-                            Value = 0
-                        });
-                    }
+                        Pin = trigger.Pin,
+                        IsPwm = trigger.IsPwm,
+                        Value = trigger.CommandValue == 1 ? 0 : 1
+                    });
+                    trigger.IsCheck = !trigger.IsCheck;
                 }
             }
         }

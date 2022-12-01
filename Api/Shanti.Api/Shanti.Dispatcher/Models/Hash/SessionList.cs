@@ -32,7 +32,7 @@ namespace Shanti.Dispatcher.Models.Hash
         public Session CreateSession(McData data)
         {
             HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7184/Dispatcher/token");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://shantitest.somee.com/Dispatcher/token");
             request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.Send(request);
             string token = response.Content.ReadAsStringAsync().Result;
@@ -52,7 +52,7 @@ namespace Shanti.Dispatcher.Models.Hash
         public Session RefreshSession(Session oldsession)
         {
             HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7184/Dispatcher/token");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://shantitest.somee.com/Dispatcher/token");
             request.Content = new StringContent(JsonConvert.SerializeObject(oldsession.Mc), Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.Send(request);
             string token = response.Content.ReadAsStringAsync().Result;

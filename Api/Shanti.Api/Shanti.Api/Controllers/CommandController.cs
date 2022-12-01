@@ -1,65 +1,66 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ApiTest.Models;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Shanti.Api.Models;
+using Shanti.Dispatcher.Models.Mc;
+using System;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
 using System.Text;
-using System.Windows.Input;
 
 namespace Shanti.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TriggerController : ControllerBase
+    public class CommandController : ControllerBase
     {
         string con = "Data Source=TestApiDB.mssql.somee.com;Initial Catalog=TestApiDB;User ID=DeadHatred_SQLLogin_2;Password=u5y75krtih";
-        [HttpPost("trigger")]
-        public string AddNewTrigger([FromBody] NewTrigger newtrigger)
-        {
-            SqlConnection connection = new SqlConnection(con);
-            DispatcherTrigger trigger = new DispatcherTrigger();
-            trigger.DeviceId = newtrigger.DeviceId;
-            trigger.CommandValue = newtrigger.CommandValue;
-            trigger.TriggerValue = newtrigger.TriggerValue;
-            trigger.SensorId = newtrigger.SensorId;
 
-            int typeId = 0;
+        [HttpPost("addcommand")]
+        public string AddNewCommand([FromBody] Command com)
+        {
+            McCommand mccommand = new McCommand();
+            mccommand.Value = com.Value;
+
+            SqlConnection connection = new SqlConnection(con);
             SqlCommand command = new SqlCommand(
-                "SELECT * FROM CONTROLLER WHERE ID = @id;"
-                , connection);
-            command.Parameters.AddWithValue("@id", newtrigger.ControllerId);
+               "SELECT * FROM CONTROLLER WHERE ID = @id;"
+               , connection);
+            command.Parameters.AddWithValue("@id", com.ControllerId);
             connection.Open();
             SqlDataReader reader = command.ExecuteReader();
+            int typeId = 0;
             if (reader.Read())
             {
                 typeId = (int)reader["TYPE_ID"];
-                trigger.Serial = reader["SERIAL"].ToString();
+                mccommand.Serial = reader["SERIAL"].ToString();
             }
             reader.Close();
 
             command = new SqlCommand(
                 "SELECT * FROM [TYPE_CONTROLLER_DEVICE] WHERE TYPE_DEVICE_ID = @did AND TYPE_CONTROLLER_ID=@cid;"
                 , connection);
-            command.Parameters.AddWithValue("@did", newtrigger.DeviceId);
+            command.Parameters.AddWithValue("@did", com.DeviceId);
             command.Parameters.AddWithValue("@cid", typeId);
 
             reader = command.ExecuteReader();
             if (reader.Read())
             {
-                trigger.IsPwm = (bool)reader["PWM"];
-                trigger.Pin = (int)reader["PIN"];
+                mccommand.IsPwm = (bool)reader["PWM"];
+                mccommand.Pin = (int)reader["PIN"];
             }
             reader.Close();
             connection.Close();
-
-            SendTrigger(trigger);
-            return JsonConvert.SerializeObject(trigger);
+            SendCommand(mccommand);
+            return JsonConvert.SerializeObject(mccommand);
+            
         }
 
-        public static bool SendTrigger(DispatcherTrigger trigger)
+        public static bool SendCommand(McCommand command)
         {
             HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://ShantiDisp.somee.com/trigger/send");
-            request.Content = new StringContent(JsonConvert.SerializeObject(trigger), Encoding.UTF8, "application/json");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://ShantiDisp.somee.com/command/send");
+            request.Content = new StringContent(JsonConvert.SerializeObject(command), Encoding.UTF8, "application/json");
             try
             {
                 HttpResponseMessage response = client.Send(request);

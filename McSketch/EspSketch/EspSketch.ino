@@ -26,7 +26,7 @@ int currentTics = 0;
 bool apiIsConnected = false;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   pinMode(16, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
@@ -53,11 +53,8 @@ void setup() {
 void loop() {
   HTTP.handleClient();
   currentTics++;
-  if(currentTics==5000){
-    Serial.println("api init");
-    APIinit();
-    readSensors();
-    runCommands();
+  if(currentTics==10){
+    runCommands(readSensors());
     currentTics=0;
   }
   delay(1);

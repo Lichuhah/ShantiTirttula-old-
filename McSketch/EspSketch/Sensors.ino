@@ -1,5 +1,6 @@
-void readSensors(){
+String readSensors(){
   if(apiIsConnected){
+    Serial.println(-1);
     while(true){
       int signal = Serial.parseInt();
       if(signal==-1){
@@ -8,8 +9,7 @@ void readSensors(){
         //float wet = Serial.parseFloat();
         int sensors[2] = {1,2};
         float datas[2] = {temp, light};
-        sendSensorValue("/sensor/send",sensors,datas);
-        break;
+        return sendSensorValue("/sensor/send",sensors,datas);
       }
     }
   }
