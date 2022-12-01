@@ -56,7 +56,7 @@ namespace Shanti.Dispatcher.Controllers
                     {
                         Pin = trigger.Pin,
                         IsPwm = trigger.IsPwm,
-                        Value = trigger.CommandValue
+                        Value = trigger.RightCommandValue
                     });
                     trigger.IsCheck = !trigger.IsCheck;
                 }
@@ -68,7 +68,7 @@ namespace Shanti.Dispatcher.Controllers
                     {
                         Pin = trigger.Pin,
                         IsPwm = trigger.IsPwm,
-                        Value = trigger.CommandValue == 1 ? 0 : 1
+                        Value = trigger.LeftCommandValue
                     });
                     trigger.IsCheck = !trigger.IsCheck;
                 }

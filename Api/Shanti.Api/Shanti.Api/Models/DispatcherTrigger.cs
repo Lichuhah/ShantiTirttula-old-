@@ -8,6 +8,7 @@
         public int SensorId { get; set; }
         public int Pin { get; set; }
         public bool IsPwm { get; set; }
-        public float CommandValue { get; set; }
+        public float RightCommandValue { get; set; }
+        public float LeftCommandValue { get; set; }
     }
 }
