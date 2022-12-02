@@ -46,7 +46,7 @@ namespace Shanti.Dispatcher.Models.Hash
                 Mc = data,
             };
 
-            request = new HttpRequestMessage(HttpMethod.Post, "https://shantitest.somee.com/trigger/get?serial="+data.Serial);        
+            request = new HttpRequestMessage(HttpMethod.Get, "https://shantitest.somee.com/trigger/get?serial="+data.Serial);        
             response = client.Send(request);
             string trs = response.Content.ReadAsStringAsync().Result;
             try

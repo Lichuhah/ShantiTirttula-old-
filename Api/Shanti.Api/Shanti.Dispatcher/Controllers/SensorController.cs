@@ -27,7 +27,8 @@ namespace Shanti.Dispatcher.Controllers
                     Session.Commands.Clear();
                 }
                 Session.AddSensordData(data);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 result += "";
             }
@@ -36,10 +37,10 @@ namespace Shanti.Dispatcher.Controllers
 
         private void CheckTriggers(List<McSensorData> data)
         {
-            foreach(McSensorData sensor in data)
+            foreach (McSensorData sensor in data)
             {
                 List<DispatcherTrigger> triggers = Session.Triggers.Where(x => x.SensorId == sensor.SensorId).ToList();
-                foreach(DispatcherTrigger trigger in triggers)
+                foreach (DispatcherTrigger trigger in triggers)
                 {
                     CreateCommand(sensor, trigger);
                 }
@@ -50,30 +51,26 @@ namespace Shanti.Dispatcher.Controllers
         {
             if (sensor.Value > trigger.TriggerValue)
             {
-                if (!trigger.IsCheck)
+                Session.Commands.Add(new McCommand
                 {
-                    Session.Commands.Add(new McCommand
-                    {
-                        Pin = trigger.Pin,
-                        IsPwm = trigger.IsPwm,
-                        Value = trigger.RightCommandValue
-                    });
-                    trigger.IsCheck = !trigger.IsCheck;
-                }
-            } else
+                    Pin = trigger.Pin,
+                    IsPwm = trigger.IsPwm,
+                    Value = trigger.RightCommandValue
+                });
+                trigger.IsCheck = !trigger.IsCheck;
+            }
+            else
             {
-                if (trigger.IsCheck)
+
+                Session.Commands.Add(new McCommand
                 {
-                    Session.Commands.Add(new McCommand
-                    {
-                        Pin = trigger.Pin,
-                        IsPwm = trigger.IsPwm,
-                        Value = trigger.LeftCommandValue
-                    });
-                    trigger.IsCheck = !trigger.IsCheck;
-                }
+                    Pin = trigger.Pin,
+                    IsPwm = trigger.IsPwm,
+                    Value = trigger.LeftCommandValue
+                });
+                trigger.IsCheck = !trigger.IsCheck;
             }
         }
-       
+
     }
 }

@@ -22,14 +22,14 @@ void APIinit(){
 }
 
 String sendSensorValue(String url, int sensors[], float values[]){
-  if(client.connect(shantiDispHost, shantiPort)){            
+  if(client.connected()){            
     String json = getSensorJson(sensors, values);
     Serial.println(json);
     client.println("POST " + url + " HTTP/1.1");
     client.println("Host: " + shantiDispHost);
     client.println("Serial: " + _serialNum);
     client.println("Mac: " + WiFi.macAddress());
-    client.println("Connection: Close");
+    client.println("Connection: keep-alive");
     client.println("Content-Type: application/json;");
     client.print("Content-Length: ");
     client.println(json.length()+2);

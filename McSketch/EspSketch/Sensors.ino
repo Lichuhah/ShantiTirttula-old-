@@ -1,7 +1,8 @@
 String readSensors(){
   if(apiIsConnected){
+    byte tries = 11;
     Serial.println(-1);
-    while(true){
+    while(--tries && true){
       int signal = Serial.parseInt();
       if(signal==-1){
         float light = Serial.parseFloat();

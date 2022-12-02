@@ -26,6 +26,7 @@ int currentTics = 0;
 bool apiIsConnected = false;
 
 void setup() {
+  delay(1000);
   Serial.begin(115200);
   pinMode(16, OUTPUT);
   pinMode(4, OUTPUT);
@@ -53,7 +54,7 @@ void setup() {
 void loop() {
   HTTP.handleClient();
   currentTics++;
-  if(currentTics==10){
+  if(currentTics==300 &&  WiFi.status() == WL_CONNECTED){
     runCommands(readSensors());
     currentTics=0;
   }
