@@ -23,14 +23,12 @@ void handle_check_Ssid() {
 
 
 void handle_set_Ssid() {
-  if(_newssid.length()>0){
     _ssid = _newssid;
     _password = _newpass;
     _newssid = "";
     _newpass = "";
     saveConfig();
     ESP.restart(); 
-  }
 }
 
 void handle_SaveLogin() {
